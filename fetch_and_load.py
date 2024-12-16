@@ -1,4 +1,7 @@
 import pandas as pd
+import snowflake.connector as snow
+from snowflake.connector.pandas_tools import write_pandas
+import pandas as pd
 import requests
 import json, math
 import datetime as dt
@@ -81,6 +84,7 @@ def fetch_daily_data(pair, range_end, epoch_startDate, epoch_endDate, n):
             print("Did not return any data from Coinbase for this symbol:" + p)
         else:
             data.to_csv(f'C:\\Users\\harsh\\coinbase_data\\Coinbase_{p}_dailydata.csv', index=False)
+            write_pandas(conn, data, "crypto", auto_create_table=True)
             # n is worker number
             print(f'Coinbase_{p}_dailydata.csv', n)
 
@@ -88,6 +92,13 @@ def fetch_daily_data(pair, range_end, epoch_startDate, epoch_endDate, n):
 if __name__ == "__main__":
     # we set which pair we want to retrieve data for
     # pair = ["ZRX-USD","1INCH-USD","AAVE-USD"]
+    conn = snow.connect(
+        user="username",
+        password="Password",
+        account="account",
+        warehouse="warehouse",
+        database="database",
+        schema="schema")
     pair = ["ETH-USD", "DOGE-USD", "BTC-USD"]
     epoch_startDate = dt.datetime(2024, 12, 5).timestamp()
     epoch_endDate = dt.datetime.today().timestamp()
